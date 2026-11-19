@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfólio de projetos de automação de Matheus" />
+  <title>Matheus | Portfólio de Automação</title>
+
+  <!-- Fontes Góticas / Clássicas inspiradas em Hollow Knight (CDN) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Evita flash de tema antes da renderização -->
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('matheus-hk-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+
+  <style>
+    /* ==========================================================================
+       1. PALETA DE CORES (HALLOWNEST ESCURO & WHITE PALACE CLARO)
+       ========================================================================== */
+    :root {
+      /* Tema Claro - White Palace / Mármore e Luz Pálida */
+      --bg-primary: #f3f1ec;
+      --bg-secondary: #eae6dd;
+      --bg-card: rgba(255, 255, 255, 0.88);
+      --bg-hud: rgba(243, 241, 236, 0.92);
+      --text-primary: #161822;
+      --text-secondary: #464b5e;
+      --accent-soul: #1e6091;       /* Azul abissal / Alma */
+      --accent-pale: #8c6d3f;       /* Ouro pálido / Selo */
+      --accent-dream: #b5651d;      /* Essência / Sonho */
+      --border-subtle: rgba(22, 24, 34, 0.18);
+      --border-strong: #2b3042;
+      --glow-color: rgba(30, 96, 145, 0.15);
+      --tag-bg: rgba(30, 96, 145, 0.08);
+    }
+
+    [data-theme="dark"] {
+      /* Tema Escuro - Hallownest / Abismo e Alma Luminescente */
+      --bg-primary: #0b0d13;
+      --bg-secondary: #111520;
+      --bg-card: rgba(19, 23, 34, 0.85);
+      --bg-hud: rgba(11, 13, 19, 0.9);
+      --text-primary: #e8ecf5;
+      --text-secondary: #9ba4bc;
+      --accent-soul: #7fd6ff;       /* Luz da Alma (Soul) */
+      --accent-pale: #d4c49e;       /* Osso / Máscara Pálida */
+      --accent-dream: #f0a868;      /* Essência do Ferrão dos Sonhos */
+      --border-subtle: rgba(212, 196, 158, 0.2);
+      --border-strong: #8c96b0;
+      --glow-color: rgba(127, 214, 255, 0.14);
+      --tag-bg: rgba(127, 214, 255, 0.08);
+    }
+
+    /* ==========================================================================
+       2. RESET E BASE TIPOGRÁFICA
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 88px;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      line-height: 1.65;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      background-image:
+        radial-gradient(circle at 50% 0%, var(--glow-color) 0%, transparent 65%),
+        radial-gradient(circle at 85% 80%, var(--glow-color) 0%, transparent 50%);
+      transition: background-color 0.35s ease, color 0.35s ease;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Canvas sutil para partículas de Alma flutuando no fundo */
+    #soul-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    h1, h2, h3, .gothic-font {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .mono-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Acessibilidade: foco visível para navegação via teclado */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-soul);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 20px;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-soul);
+      padding: 10px 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      z-index: 2000;
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    /* ==========================================================================
+       3. MOLDURAS ORNAMENTADAS E BOTÕES (ESTÉTICA HALLOWNEST)
+       ========================================================================== */
+    .hallownest-frame {
+      background-color: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.12),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      position: relative;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+    }
+
+    /* Cantoneiras finas em estilo ferro forjado / osso */
+    .hallownest-frame::before,
+    .hallownest-frame::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-color: var(--accent-pale);
+      border-style: solid;
+      pointer-events: none;
+      transition: width 0.25s ease, height 0.25s ease;
+    }
+
+    .hallownest-frame::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+
+    .hallownest-frame::after {
+      bottom: -1px;
+      right: -1px;
+      border-width: 0 2px 2px 0;
+    }
+
+    .hallownest-frame:hover {
+      border-color: var(--accent-pale);
+      box-shadow: 0 12px 34px var(--glow-color);
+    }
+
+    .hallownest-frame:hover::before,
+    .hallownest-frame:hover::after {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Botões refinados com brilho sutil de Alma */
+    .soul-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 11px 20px;
+      background-color: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-strong);
+      text-decoration: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .soul-btn:hover {
+      border-color: var(--accent-soul);
+      color: var(--accent-soul);
+      box-shadow: 0 0 16px var(--glow-color), inset 0 0 10px var(--glow-color);
+    }
+
+    .soul-btn--primary {
+      background-color: var(--tag-bg);
+      border-color: var(--accent-pale);
+    }
+
+    .soul-btn--primary:hover {
+      background-color: var(--accent-soul);
+      color: var(--bg-primary);
+      border-color: var(--accent-soul);
+    }
+
+    .soul-btn--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Divisor ornamental com losango central */
+    .ornament-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 8px 0 28px;
+      opacity: 0.75;
+    }
+
+    .ornament-divider::before,
+    .ornament-divider::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: linear-gradient(90deg, transparent, var(--accent-pale), transparent);
+    }
+
+    .ornament-diamond {
+      width: 8px;
+      height: 8px;
+      border: 1px solid var(--accent-pale);
+      transform: rotate(45deg);
+      background-color: var(--bg-primary);
+    }
+
+    /* ==========================================================================
+       4. BARRA DE NAVEGAÇÃO FIXA (HUD)
+       ========================================================================== */
+    .hud-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background-color: var(--bg-hud);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hud-container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    /* Orbe de Alma no logotipo */
+    .soul-vessel {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent-pale);
+      background: radial-gradient(circle at 35% 35%, #ffffff, var(--accent-soul));
+      box-shadow: 0 0 10px var(--accent-soul);
+    }
+
+    .nav-group {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 2px;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 1px;
+      background-color: var(--accent-soul);
+      transition: width 0.25s ease, left 0.25s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text-primary);
+    }
+
+    .nav-links a:hover::after,
+    .nav-links a:focus-visible::after {
+      width: 100%;
+      left: 0;
+    }
+
+    .theme-toggle {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 7px 14px;
+      background-color: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent-pale);
+      box-shadow: 0 0 12px var(--glow-color);
+    }
+
+    /* ==========================================================================
+       5. ESTRUTURA PRINCIPAL E CABEÇALHOS DE SEÇÃO
+       ========================================================================== */
+    main {
+      flex: 1;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      text-align: center;
+    }
+
+    .section-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-pale);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.3rem, 3vw, 1.75rem);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       6. SEÇÃO SOBRE (APRESENTAÇÃO DO MATHEUS)
+       ========================================================================== */
+    .hero-card {
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .crest-container {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle, var(--tag-bg) 0%, transparent 72%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .crest-container::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 50%;
+      border: 1px dashed var(--accent-pale);
+      opacity: 0.5;
+    }
+
+    .hero-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      color: var(--accent-soul);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .hero-title span {
+      color: var(--accent-pale);
+    }
+
+    .bio-box {
+      border-left: 2px solid var(--accent-pale);
+      padding-left: 18px;
+      margin-bottom: 24px;
+      color: var(--text-secondary);
+      font-size: 1.3rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       7. SEÇÃO DE PROJETOS (AMULETOS / CHARMS DE AUTOMAÇÃO)
+       ========================================================================== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(295px, 1fr));
+      gap: 28px;
+    }
+
+    .project-card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .project-card--placeholder {
+      border-style: dashed;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .charm-slot {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--accent-pale);
+      text-transform: uppercase;
+    }
+
+    .project-title {
+      font-size: 1.15rem;
+      margin: 14px 0 10px;
+      color: var(--text-primary);
+    }
+
+    .project-desc {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+    }
+
+    .tech-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tech-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      background-color: var(--tag-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       8. SEÇÃO DE CONTATO (BANCO DE DESCANSO / BENCH)
+       ========================================================================== */
+    .contact-card {
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .contact-info {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      max-width: 580px;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       9. RODAPÉ
+       ========================================================================== */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       10. RESPONSIVIDADE (MOBILE)
+       ========================================================================== */
+    @media (max-width: 720px) {
+      html {
+        scroll-padding-top: 120px;
+      }
+
+      main {
+        padding-top: 140px;
+        gap: 60px;
+      }
+
+      .hud-container {
+        justify-content: center;
+      }
+
+      .nav-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .hero-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
+        padding: 26px;
+      }
+
+      .bio-box {
+        border-left: none;
+        border-top: 1px solid var(--accent-pale);
+        padding-left: 0;
+        padding-top: 16px;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .contact-info {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fundo sutil com partículas de Alma -->
+  <canvas id="soul-canvas" aria-hidden="true"></canvas>
+
+  <!-- Link de acessibilidade para teclado -->
+  <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo principal</a>
+
+  <!-- ========================================================================
+       MENU DE NAVEGAÇÃO FIXO (HUD)
+       Para adicionar um novo item no menu: inclua um <li> com <a href="#id-secao">
+       ======================================================================== -->
+  <header class="hud-header">
+    <div class="hud-container">
+      <a href="#sobre" class="brand" aria-label="Início - Portfólio de Matheus">
+        <span class="soul-vessel" aria-hidden="true"></span>
+        <span>MATHEUS</span>
+      </a>
+
+      <div class="nav-group">
+        <nav aria-label="Navegação principal">
+          <ul class="nav-links">
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#projetos">Projetos</a></li>
+            <li><a href="#contato">Contato</a></li>
+            <!-- ADICIONE NOVOS LINKS DE SEÇÃO AQUI -->
+          </ul>
+        </nav>
+
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Alternar entre tema claro e escuro"
+          aria-pressed="false"
+        >
+          <span id="theme-icon" aria-hidden="true">✦</span>
+          <span id="theme-label">TEMA</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="conteudo-principal">
+    <!-- ======================================================================
+         SEÇÃO 1: SOBRE / APRESENTAÇÃO
+         ====================================================================== -->
+    <section id="sobre" aria-labelledby="titulo-sobre">
+      <div class="section-header">
+        <span class="section-subtitle">I. O Viajante</span>
+        <h2 id="titulo-sobre">Sobre Mim</h2>
+      </div>
+      <div class="ornament-divider" aria-hidden="true"><span class="ornament-diamond"></span></div>
+
+      <div class="hallownest-frame hero-card">
+        <!-- Brasão vetorial fino inspirado em Hollow Knight (SVG inline) -->
+        <div class="crest-container">
+          <svg
+            width="92"
+            height="92"
+            viewBox="0 0 100 100"
+            fill="none"
+            role="img"
+            aria-label="Brasão estilizado com chifres curvos e núcleo luminoso representando Matheus"
+          >
+            <!-- Chifres curvos elegantes -->
+            <path
+              d="M34 52 C18 42, 16 20, 32 10 C26 22, 28 36, 40 44"
+              stroke="var(--accent-pale)"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M66 52 C82 42, 84 20, 68 10 C74 22, 72 36, 60 44"
+              stroke="var(--accent-pale)"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+            <!-- Máscara / Escudo central -->
+            <path
+              d="M34 46 C34 34, 66 34, 66 46 C66 66, 56 80, 50 86 C44 80, 34 66, 34 46 Z"
+              stroke="var(--text-primary)"
+              stroke-width="2"
+              fill="var(--bg-secondary)"
+            />
+            <!-- Olhos vazados -->
+            <ellipse cx="43" cy="54" rx="4.5" ry="6.5" fill="var(--accent-soul)" />
+            <ellipse cx="57" cy="54" rx="4.5" ry="6.5" fill="var(--accent-soul)" />
+            <!-- Detalhe de ferrão/agulha sutil ao fundo -->
+            <line x1="50" y1="6" x2="50" y2="94" stroke="var(--accent-pale)" stroke-width="1" stroke-dasharray="2 3" />
+          </svg>
+        </div>
+
+        <div>
+          <p class="hero-kicker">Engenharia &amp; Automação de Sistemas</p>
+          <h1 class="hero-title">Olá, eu sou o <span>Matheus</span>.</h1>
+
+          <!-- ESPAÇO EDITÁVEL PARA A BIO: Substitua o texto abaixo pela sua apresentação -->
+          <div class="bio-box">
+            <p>
+              [Espaço para sua bio] Desenvolvedor dedicado a forjar automações, scripts e integrações
+              silenciosas que transformam tarefas repetitivas em fluxos autônomos. Este portfólio é
+              um mapa em constante expansão — explore abaixo os artefatos já catalogados e os
+              espaços reservados para futuras descobertas.
+            </p>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#projetos" class="soul-btn soul-btn--primary">Explorar Projetos</a>
+            <a href="#contato" class="soul-btn">Descansar no Banco</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         SEÇÃO 2: PROJETOS DE AUTOMAÇÃO
+         COMO ADICIONAR UM NOVO PROJETO:
+         Copie um bloco <article class="hallownest-frame project-card">...</article>,
+         cole dentro de <div class="projects-grid"> e preencha título, descrição,
+         tags de tecnologias e o link do repositório/demo.
+         ====================================================================== -->
+    <section id="projetos" aria-labelledby="titulo-projetos">
+      <div class="section-header">
+        <span class="section-subtitle">II. Artefatos &amp; Amuletos</span>
+        <h2 id="titulo-projetos">Projetos de Automação</h2>
+      </div>
+      <div class="ornament-divider" aria-hidden="true"><span class="ornament-diamond"></span></div>
+
+      <div class="projects-grid">
+        <!-- PROJETO 01 (PLACEHOLDER PRONTO PARA PREENCHER) -->
+        <article class="hallownest-frame project-card project-card--placeholder">
+          <div>
+            <div class="card-header">
+              <span class="charm-slot">Encaixe 01 // Em Breve</span>
+              <!-- Ícone de Amuleto (Charm) em SVG fino -->
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="8" stroke="var(--accent-pale)" stroke-width="1.5" />
+                <polygon points="12,6 16,12 12,18 8,12" stroke="var(--accent-soul)" stroke-width="1.5" />
+              </svg>
+            </div>
+
+            <h3 class="project-title">[Título do Projeto 01]</h3>
+            <p class="project-desc">
+              Espaço reservado para descrever o problema resolvido, a arquitetura da automação e o impacto gerado.
+            </p>
+
+            <ul class="tech-list" aria-label="Tecnologias utilizadas">
+              <li class="tech-tag">Python</li>
+              <li class="tech-tag">APIs / Webhooks</li>
+              <li class="tech-tag">Automação</li>
+            </ul>
+          </div>
+
+          <div>
+            <!-- Troque "#" pelo link do GitHub e remova "soul-btn--disabled" quando publicar -->
+            <a href="#" class="soul-btn soul-btn--disabled" aria-disabled="true">
+              Aguardando Forja
+            </a>
+          </div>
+        </article>
+
+        <!-- PROJETO 02 (PLACEHOLDER PRONTO PARA PREENCHER) -->
+        <article class="hallownest-frame project-card project-card--placeholder">
+          <div>
+            <div class="card-header">
+              <span class="charm-slot">Encaixe 02 // Em Breve</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="8" stroke="var(--accent-pale)" stroke-width="1.5" />
+                <circle cx="12" cy="12" r="3" stroke="var(--accent-soul)" stroke-width="1.5" />
+              </svg>
+            </div>
+
+            <h3 class="project-title">[Título do Projeto 02]</h3>
+            <p class="project-desc">
+              Espaço reservado para um futuro bot, extrator de dados, pipeline agendado ou integração entre sistemas.
+            </p>
+
+            <ul class="tech-list" aria-label="Tecnologias utilizadas">
+              <li class="tech-tag">JavaScript</li>
+              <li class="tech-tag">Node.js</li>
+              <li class="tech-tag">CLI</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="#" class="soul-btn soul-btn--disabled" aria-disabled="true">
+              Aguardando Forja
+            </a>
+          </div>
+        </article>
+
+        <!-- PROJETO 03 (PLACEHOLDER PRONTO PARA PREENCHER) -->
+        <article class="hallownest-frame project-card project-card--placeholder">
+          <div>
+            <div class="card-header">
+              <span class="charm-slot">Encaixe 03 // Selado</span>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3L20 12L12 21L4 12Z" stroke="var(--accent-pale)" stroke-width="1.5" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="var(--accent-dream)" stroke-width="1.5" />
+              </svg>
+            </div>
+
+            <h3 class="project-title">[Título do Projeto 03]</h3>
+            <p class="project-desc">
+              Região ainda inexplorada no mapa. Será desbloqueada assim que a próxima automação for concluída.
+            </p>
+
+            <ul class="tech-list" aria-label="Tecnologias utilizadas">
+              <li class="tech-tag">RPA</li>
+              <li class="tech-tag">Docker</li>
+              <li class="tech-tag">GitHub Actions</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="#" class="soul-btn soul-btn--disabled" aria-disabled="true">
+              Encaixe Selado
+            </a>
+          </div>
+        </article>
+
+        <!-- ADICIONE NOVOS CARDS DE PROJETO AQUI -->
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         COMO ADICIONAR NOVAS SEÇÕES NO FUTURO (EX: HABILIDADES, FERRAMENTAS):
+         1. Copie a estrutura <section id="nome-da-secao" aria-labelledby="titulo-secao">
+         2. Inclua o <div class="section-header"> e o <div class="ornament-divider">
+         3. Coloque o conteúdo dentro de uma <div class="hallownest-frame">
+         4. Adicione o link correspondente na lista <ul class="nav-links"> no topo
+         ====================================================================== -->
+
+    <!-- ======================================================================
+         SEÇÃO 3: CONTATO (BANCO DE DESCANSO / BENCH)
+         ====================================================================== -->
+    <section id="contato" aria-labelledby="titulo-contato">
+      <div class="section-header">
+        <span class="section-subtitle">III. Ponto de Descanso</span>
+        <h2 id="titulo-contato">Contato</h2>
+      </div>
+      <div class="ornament-divider" aria-hidden="true"><span class="ornament-diamond"></span></div>
+
+      <div class="hallownest-frame contact-card">
+        <div class="contact-info">
+          <!-- Ícone minimalista de Banco de Ferro Forjado / Lanterna (SVG) -->
+          <svg
+            width="60"
+            height="60"
+            viewBox="0 0 64 64"
+            fill="none"
+            role="img"
+            aria-label="Ícone de banco ornamentado de descanso"
+          >
+            <!-- Encosto curvo -->
+            <path
+              d="M14 34 C14 20, 50 20, 50 34"
+              stroke="var(--accent-pale)"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M20 34 C20 25, 44 25, 44 34"
+              stroke="var(--text-secondary)"
+              stroke-width="1.2"
+            />
+            <!-- Assento -->
+            <line x1="10" y1="36" x2="54" y2="36" stroke="var(--text-primary)" stroke-width="2.5" stroke-linecap="round" />
+            <!-- Pés curvos -->
+            <path d="M16 36 C16 44, 12 48, 10 50" stroke="var(--accent-pale)" stroke-width="2" stroke-linecap="round" />
+            <path d="M48 36 C48 44, 52 48, 54 50" stroke="var(--accent-pale)" stroke-width="2" stroke-linecap="round" />
+            <!-- Brilho sutil de Alma acima -->
+            <circle cx="32" cy="14" r="2.5" fill="var(--accent-soul)" />
+          </svg>
+
+          <div>
+            <h3 style="font-size: 1.05rem; margin-bottom: 6px;">Progresso Registrado</h3>
+            <p style="color: var(--text-secondary);">
+              Descanse um pouco e envie um sinal. Atualize os links ao lado com seus canais oficiais para conversar sobre automação e desenvolvimento.
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-links">
+          <!-- Substitua os href abaixo pelos seus links reais -->
+          <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="soul-btn soul-btn--primary">
+            GitHub
+          </a>
+          <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer" class="soul-btn">
+            LinkedIn
+          </a>
+          <a href="mailto:seu-email@exemplo.com" class="soul-btn">
+            E-mail
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Matheus — Portfólio de Automação &bull; Forjado com HTML, CSS &amp; JavaScript</p>
+  </footer>
+
+  <!-- ========================================================================
+       JAVASCRIPT: ALTERNÂNCIA DE TEMA & PARTÍCULAS SUTIS DE ALMA
+       ======================================================================== -->
+  <script>
+    // 1. Controle de Tema Claro (White Palace) / Escuro (Hallownest)
+    (function () {
+      const STORAGE_KEY = 'matheus-hk-theme';
+      const rootElement = document.documentElement;
+      const toggleButton = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeLabel = document.getElementById('theme-label');
+
+      function applyTheme(theme) {
+        rootElement.setAttribute('data-theme', theme);
+        const isDark = theme === 'dark';
+
+        toggleButton.setAttribute('aria-pressed', String(isDark));
+        toggleButton.setAttribute(
+          'aria-label',
+          isDark ? 'Mudar para tema claro' : 'Mudar para tema escuro'
+        );
+
+        themeIcon.textContent = isDark ? '☾' : '☀';
+        themeLabel.textContent = isDark ? 'Abismo' : 'Luz Pálida';
+      }
+
+      const currentTheme = rootElement.getAttribute('data-theme') || 'dark';
+      applyTheme(currentTheme);
+
+      toggleButton.addEventListener('click', function () {
+        const activeTheme = rootElement.getAttribute('data-theme');
+        const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(STORAGE_KEY, nextTheme);
+        applyTheme(nextTheme);
+      });
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (event) {
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          applyTheme(event.matches ? 'dark' : 'light');
+        }
+      });
+    })();
+
+    // 2. Partículas sutis de "Alma / Essência" flutuando no fundo (respeita prefers-reduced-motion)
+    (function () {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) return;
+
+      const canvas = document.getElementById('soul-canvas');
+      const ctx = canvas.getContext('2d');
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', function () {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particles = Array.from({ length: 28 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2.2 + 0.8,
+        speedY: -(Math.random() * 0.35 + 0.12),
+        drift: Math.random() * Math.PI * 2,
+        alpha: Math.random() * 0.5 + 0.15
+      }));
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.fillStyle = isDark ? 'rgba(127, 214, 255, 0.45)' : 'rgba(30, 96, 145, 0.28)';
+
+        for (const p of particles) {
+          p.y += p.speedY;
+          p.drift += 0.015;
+          p.x += Math.sin(p.drift) * 0.25;
+
+          if (p.y < -10) {
+            p.y = height + 10;
+            p.x = Math.random() * width;
+          }
+
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+  </script>
+</body>
+</html>
